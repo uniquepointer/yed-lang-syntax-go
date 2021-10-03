@@ -186,6 +186,7 @@ syntax_go_buff_mod_post_handler(yed_event* event)
     highlight_buffer_post_mod_update(&hinfo, event);
 }
 
+// TODO cleanup these sons of bitches and give them a nicer name
 void
 fmtFile(void)
 {
