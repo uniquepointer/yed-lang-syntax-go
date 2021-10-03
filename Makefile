@@ -1,5 +1,5 @@
 CFLAGS += $(shell yed --print-cflags)
-CFLAGS += $(shell yed --print-ldflags)
+CFLAGS += $(shell yed --print-ldflags) -Werror
 install:
 	gcc $(CFLAGS) go.c -o go.so
-	cp ./go.so ~/.config/yed/mpy/plugins
+	cp ./go.so ~/.config/yed/mpy/plugins/lang/syntax/.
