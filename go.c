@@ -5,7 +5,6 @@
 
 highlight_info hinfo;
 
-
 void
 unload(yed_plugin* self);
 void
@@ -16,22 +15,11 @@ void
 syntax_go_buff_mod_pre_handler(yed_event* event);
 void
 syntax_go_buff_mod_post_handler(yed_event* event);
-void
-syntax_go_fmt(yed_event* event);
-void
-syntax_go_reload_fmt(yed_event* event);
-void
-buff_path_for_fmt(yed_event* event);
-
-char bufferLoc[512];
 
 int
 yed_plugin_boot(yed_plugin* self)
 {
     yed_event_handler frame, line, buff_mod_pre, buff_mod_post;
-    yed_event_handler gofmt;
-    yed_event_handler reload;
-    yed_event_handler getpath;
 
     char*             kwds[] = {
         "func",
@@ -42,7 +30,7 @@ yed_plugin_boot(yed_plugin* self)
         "var",
 
     };
-    char* pp_kwds[] = {
+    char* special_kwds[] = {
         "import",
         "package",
         "defer",
@@ -85,23 +73,16 @@ yed_plugin_boot(yed_plugin* self)
     buff_mod_post.kind = EVENT_BUFFER_POST_MOD;
     buff_mod_post.fn   = syntax_go_buff_mod_post_handler;
 
-    getpath.kind       = EVENT_BUFFER_POST_LOAD;
-    getpath.fn         = buff_path_for_fmt;
-    gofmt.kind         = EVENT_BUFFER_POST_WRITE;
-    gofmt.fn           = syntax_go_fmt;
     yed_plugin_add_event_handler(self, frame);
     yed_plugin_add_event_handler(self, line);
     yed_plugin_add_event_handler(self, buff_mod_pre);
     yed_plugin_add_event_handler(self, buff_mod_post);
-    yed_plugin_add_event_handler(self, getpath);
-    yed_plugin_add_event_handler(self, gofmt);
 
     highlight_info_make(&hinfo);
 
     ARRAY_LOOP(kwds)
         highlight_add_kwd(&hinfo, *it, HL_KEY);
-    ARRAY_LOOP(pp_kwds)
-        highlight_add_prefixed_kwd(&hinfo, '#', *it, HL_PP);
+    ARRAY_LOOP(special_kwds)
     ARRAY_LOOP(control_flow)
         highlight_add_kwd(&hinfo, *it, HL_CF);
     ARRAY_LOOP(typenames)
@@ -116,7 +97,6 @@ yed_plugin_boot(yed_plugin* self)
     highlight_within(&hinfo, "'", "'", '\\', 1, HL_CHAR);
     highlight_to_eol_from(&hinfo, "//", HL_COMMENT);
     highlight_within_multiline(&hinfo, "/*", "*/", 0, HL_COMMENT);
-    highlight_within_multiline(&hinfo, "#if 0", "#endif", 0, HL_COMMENT);
 
     ys->redraw = 1;
 
@@ -184,66 +164,4 @@ syntax_go_buff_mod_post_handler(yed_event* event)
     }
 
     highlight_buffer_post_mod_update(&hinfo, event);
-}
-
-// TODO cleanup these sons of bitches and give them a nicer name
-void
-fmtFile(void)
-{
-    int  output_len, status;
-
-    char cmd_buff[1024];
-
-    snprintf(cmd_buff, sizeof(cmd_buff), "gofmt -w %s", bufferLoc);
-
-    yed_run_subproc(cmd_buff, &output_len, &status);
-
-    if (status != 0)
-    {
-        yed_cprint("Failure to format golang\n");
-    }
-    else
-    {
-        yed_cprint("Formatted buffer\n");
-    }
-}
-
-void
-syntax_go_fmt(yed_event* event)
-{
-    fmtFile();
-    YEXE("buffer-reload");
-    yed_cprint("Buffer reloaded");
-}
-
-void
-buff_path_for_fmt(yed_event* event)
-{
-    yed_buffer* buffer;
-    yed_frame*  frame;
-
-    if (!ys->active_frame)
-    {
-        yed_cerr("no active frame");
-        return;
-    }
-
-    frame = ys->active_frame;
-
-    if (!frame->buffer)
-    {
-        yed_cerr("active frame has no buffer");
-        return;
-    }
-
-    buffer = frame->buffer;
-
-    if (buffer->name)
-    {
-        strcpy(bufferLoc, buffer->path);
-    }
-    else
-    {
-        yed_cerr("buffer has no path");
-    }
 }
