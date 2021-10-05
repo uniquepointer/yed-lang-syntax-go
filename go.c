@@ -21,7 +21,7 @@ yed_plugin_boot(yed_plugin* self)
 {
     yed_event_handler frame, line, buff_mod_pre, buff_mod_post;
 
-    char*             kwds[] = {
+    char* kwds[] = {
         "func",
         "interface",
         "package",
@@ -83,6 +83,7 @@ yed_plugin_boot(yed_plugin* self)
     ARRAY_LOOP(kwds)
         highlight_add_kwd(&hinfo, *it, HL_KEY);
     ARRAY_LOOP(special_kwds)
+        highlight_add_kwd(&hinfo, *it, HL_PP);
     ARRAY_LOOP(control_flow)
         highlight_add_kwd(&hinfo, *it, HL_CF);
     ARRAY_LOOP(typenames)
