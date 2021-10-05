@@ -1,7 +1,10 @@
 #include <yed/plugin.h>
 #include <yed/highlight.h>
 
-#define ARRAY_LOOP(a) for (__typeof((a)[0]) *it = (a); it < (a) + (sizeof(a) / sizeof((a)[0])); ++it)
+#define ARRAY_LOOP(a)                             \
+    for (__typeof((a)[0])* it = (a);              \
+         it < (a) + (sizeof(a) / sizeof((a)[0])); \
+         ++it)
 
 highlight_info hinfo;
 
@@ -21,7 +24,7 @@ yed_plugin_boot(yed_plugin* self)
 {
     yed_event_handler frame, line, buff_mod_pre, buff_mod_post;
 
-    char* kwds[] = {
+    char*             kwds[] = {
         "func",
         "interface",
         "package",
@@ -81,13 +84,13 @@ yed_plugin_boot(yed_plugin* self)
     highlight_info_make(&hinfo);
 
     ARRAY_LOOP(kwds)
-        highlight_add_kwd(&hinfo, *it, HL_KEY);
+    highlight_add_kwd(&hinfo, *it, HL_KEY);
     ARRAY_LOOP(special_kwds)
-        highlight_add_kwd(&hinfo, *it, HL_PP);
+    highlight_add_kwd(&hinfo, *it, HL_PP);
     ARRAY_LOOP(control_flow)
-        highlight_add_kwd(&hinfo, *it, HL_CF);
+    highlight_add_kwd(&hinfo, *it, HL_CF);
     ARRAY_LOOP(typenames)
-        highlight_add_kwd(&hinfo, *it, HL_TYPE);
+    highlight_add_kwd(&hinfo, *it, HL_TYPE);
     highlight_add_kwd(&hinfo, "nil", HL_CON);
     highlight_add_kwd(&hinfo, "stdin", HL_CON);
     highlight_add_kwd(&hinfo, "stdout", HL_CON);
