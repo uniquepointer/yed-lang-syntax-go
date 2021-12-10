@@ -58,7 +58,7 @@ eline(yed_event* event)
     if (!frame
             ||  !frame->buffer
             ||  frame->buffer->kind != BUFF_KIND_FILE
-            ||  frame->buffer->ft != yed_get_ft("C"))
+            ||  frame->buffer->ft != yed_get_ft("Golang"))
     {
         return;
     }
@@ -111,8 +111,6 @@ yed_plugin_boot(yed_plugin* self)
     RANGE("//");
     ONELINE();
     ENDRANGE("$");
-    RANGE("^[[:space:]]*#[[:space:]]*if[[:space:]]+0"WB);
-    ENDRANGE("^[[:space:]]*#[[:space:]]*(else|endif|elif|elifdef)"WB);
     APOP();
 
     APUSH("&code-string");
@@ -208,7 +206,7 @@ yed_plugin_boot(yed_plugin* self)
     APOP();
 
     APUSH("&code-field");
-    REGEXSUB("(\\.|->)[[:space:]]*([[:alpha:]_][[:alnum:]_]*)", 2);
+    REGEXSUB("(\\.)[[:space:]]*([[:alpha:]_][[:alnum:]_]*)", 2);
     APOP();
     ENDSYN();
 
