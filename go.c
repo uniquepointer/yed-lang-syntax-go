@@ -161,6 +161,7 @@ yed_plugin_boot(yed_plugin* self)
     KWD("switch");
     KWD("range");
     KWD("select");
+    KWD("defer");
     REGEXSUB("^[[:space:]]*([[:alpha:]_][[:alnum:]_]*):", 1);
     APOP();
 
@@ -192,7 +193,6 @@ yed_plugin_boot(yed_plugin* self)
     APUSH("&code-preprocessor");
     KWD("import");
     KWD("package");
-    KWD("defer");
     KWD("go");
     KWD("make");
     KWD("chan");
